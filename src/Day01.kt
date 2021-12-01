@@ -1,17 +1,13 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
-    }
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
+    // This so super inefficient but quite nice from an API perspective
+    fun countWindowsLargerThanPrevious(input: List<String>, windowSize: Int = 3): Int =
+            input.map { x -> x.toInt() }.windowed(windowSize).windowed(2).count { (a, b) -> b.sum() > a.sum() }
 
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
+    fun countNumbersLargerThanPrevious(inputs: List<String>) =
+            countWindowsLargerThanPrevious(inputs, windowSize = 1)
 
-    val input = readInput("Day01")
-    println(part1(input))
-    println(part2(input))
+    val measurements = readInput("Day01")
+    println(countNumbersLargerThanPrevious(measurements))
+    println(countWindowsLargerThanPrevious(measurements))
 }
