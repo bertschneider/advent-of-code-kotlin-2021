@@ -1,7 +1,7 @@
 // This solution is super over-engineered and a simple loop with a when expression would have been enough.
 // Regardless, I wanted to use proper classes and create an object-oriented solution.
 
-data class Position(val x: Int, val y: Int)
+data class Position(val x: Int, val y: Int, val a: Int)
 
 sealed interface Command {
     operator fun invoke(position: Position): Position
@@ -18,24 +18,24 @@ sealed interface Command {
     }
 }
 data class Forward(val value: Int): Command {
-        override operator fun invoke(position: Position): Position {
-            return position.copy(x = position.x + value)
-        }
+    override operator fun invoke(position: Position): Position {
+        return position.copy(x = position.x + value, y = position.y + position.a * value)
+    }
 }
 data class Up(val value: Int): Command {
     override operator fun invoke(position: Position): Position {
-        return position.copy(y = position.y - value)
+        return position.copy(a = position.a - value)
     }
 }
 data class Down(val value: Int): Command {
     override operator fun invoke(position: Position): Position {
-        return position.copy(y = position.y + value)
+        return position.copy(a = position.a + value)
     }
 }
 
 fun main() {
     val commands: List<Command> = readInput("Day02").map(Command::parse)
-    val position = commands.fold(Position(0, 0)) { position, command -> command(position)}
+    val position = commands.fold(Position(0, 0, 0)) { position, command -> command(position)}
     val multipliedPosition = position.x * position.y
-    println("Multiplication of $position is $multipliedPosition")
+    println("End position of $position is $multipliedPosition")
 }
