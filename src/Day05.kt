@@ -1,3 +1,5 @@
+import kotlin.math.absoluteValue
+
 fun main() {
     val input = readInput("Day05")
     val lines = input.map { line ->
@@ -25,7 +27,20 @@ data class Point(val x: Int, val y: Int) {
         } else if (this.y == other.y) {
             range(this.x, other.x).map { Point(it, this.y) }
         } else {
-            emptyList()
+            val fn: (Point) -> Point = if (this.x < other.x) {
+                if (this.y < other.y) {
+                    { p -> Point(p.x + 1, p.y + 1) }
+                } else {
+                    { p -> Point(p.x + 1, p.y - 1) }
+                }
+            } else {
+                if (this.y < other.y) {
+                    { p -> Point(p.x - 1, p.y + 1) }
+                } else {
+                    { p -> Point(p.x - 1, p.y - 1) }
+                }
+            }
+            generateSequence(this, fn).take((this.x - other.x).absoluteValue).toList()
         }
     }
 }
