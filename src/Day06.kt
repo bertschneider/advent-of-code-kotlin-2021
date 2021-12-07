@@ -1,20 +1,24 @@
 fun main() {
     val input = readInput("Day06")
-    val initialFishPopulation = input.first().split(",").map { it.toInt() }
+    val initialFishPopulation = input.first().split(",").map { it.toInt() }.groupBy { it }.mapValues { it.value.count().toLong() }
     println(initialFishPopulation)
 
-    val evolution = generateSequence(initialFishPopulation) { population ->
-        population.flatMap { fish ->
-            if (fish == 0) {
-                listOf(6, 8)
+    val days = (0 .. 8).reversed()
+    val evolution = generateSequence(initialFishPopulation) { dailyPopulation ->
+        days.fold(mutableMapOf()) { nextPopulation, day ->
+            if (day == 0) {
+                val reproductionCount = dailyPopulation.getOrDefault(day, 0)
+                nextPopulation[8] = reproductionCount
+                nextPopulation[6] = nextPopulation.getOrDefault(6, 0) + reproductionCount
             } else {
-                listOf(fish - 1)
+                nextPopulation[day - 1] = dailyPopulation.getOrDefault(day, 0)
             }
+            nextPopulation
         }
     }
 
-    evolution.take(81).forEachIndexed { day, population ->
-        println("$day: ${population.size}")
+    evolution.take(257).forEachIndexed { day, population ->
+        println("$day: ${population.values.sum()}")
     }
 }
 
