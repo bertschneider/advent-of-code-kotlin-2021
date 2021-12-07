@@ -10,7 +10,10 @@ fun main() {
     val positions = min .. max
 
     val costsPerPosition = positions.fold(mutableMapOf<Int, Int>()) { costs, target ->
-        costs[target] = crabPositions.sumOf { (it - target).absoluteValue }
+        costs[target] = crabPositions.sumOf {
+            val distance = (it - target).absoluteValue
+            (distance * (distance + 1))/2
+        }
         costs
     }
     val minCosts = costsPerPosition.minByOrNull { it.value }
