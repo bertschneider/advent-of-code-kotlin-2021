@@ -4,16 +4,21 @@ fun main() {
     val initial = Game.parse(lines.drop(1))
 
     val boards = generateSequence(initial to numbers) { (game, numbers) ->
-        game.draw(numbers.first()) to numbers.drop(1)
+        game.filter { board -> !board.hasWon() }.draw(numbers.first()) to numbers.drop(1)
     }
-
-    val score = boards.firstNotNullOf { (game, numbers) ->
-        println("Numbers: $numbers")
-        println(game)
+    val winnerScore = boards.firstNotNullOf { (game, _) ->
         game.score()
     }
+    println("Winner Score: $winnerScore")
 
-    println("Winner Score: $score")
+    val lastScore = boards.firstNotNullOf { (game, _) ->
+        if (game.boards.size == 1) {
+            game.score()
+        } else {
+            null
+        }
+    }
+    println("Last Score: $lastScore")
 }
 
 data class Game(val boards: List<Board>, val number: Int?, val round: Int = 0) {
@@ -50,6 +55,10 @@ data class Game(val boards: List<Board>, val number: Int?, val round: Int = 0) {
 
     private fun hasWinner(): Boolean {
         return winner() != null
+    }
+
+    fun filter(predicate: (Board) -> Boolean): Game {
+        return Game(boards.filter(predicate), number, round)
     }
 
     override fun toString(): String {
