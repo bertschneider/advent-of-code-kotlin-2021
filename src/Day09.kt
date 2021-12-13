@@ -1,12 +1,12 @@
 fun main() {
     val ground = readInput("Day09")
-        .foldIndexed(mutableMapOf<P, Int>()) { x, m, line ->
-            line.forEachIndexed { y, c -> m[P(x, y)] = c.digitToInt() }
+        .foldIndexed(mutableMapOf<Point, Int>()) { x, m, line ->
+            line.forEachIndexed { y, c -> m[Point(x, y)] = c.digitToInt() }
             m
         }
 
     val lowestPositions = ground.filter { (point, value) ->
-        point.neighbours().mapNotNull { ground[it] }.all { value < it }
+        point.straightNeighbours().mapNotNull { ground[it] }.all { value < it }
     }
     val riskLevel = lowestPositions.values.sumOf { 1 + it }
 
@@ -21,16 +21,10 @@ fun main() {
     println("Basin Product: $basinProduct")
 }
 
-data class P(private val x: Int, private val y: Int) {
-    fun neighbours(): Set<P> {
-        return setOf(P(x, y - 1), P(x + 1, y), P(x, y + 1), P(x - 1, y))
-    }
-}
-
 // Had to use MutableSet for the next functions due to too much overhead for the immutable variants
 
-fun findNeighbours(current: P, left: MutableSet<P>): Set<P> {
-    val leftNeighbours = current.neighbours().filter { left.contains(it) }.toSet()
+fun findNeighbours(current: Point, left: MutableSet<Point>): Set<Point> {
+    val leftNeighbours = current.straightNeighbours().filter { left.contains(it) }.toSet()
     left.removeAll(leftNeighbours)
     left.remove(current)
     val neighbours = mutableSetOf(current)
@@ -38,7 +32,7 @@ fun findNeighbours(current: P, left: MutableSet<P>): Set<P> {
     return neighbours
 }
 
-fun findBasins(left: MutableSet<P>): List<Set<P>> {
+fun findBasins(left: MutableSet<Point>): List<Set<Point>> {
     return if (left.isEmpty()) {
         emptyList()
     } else {

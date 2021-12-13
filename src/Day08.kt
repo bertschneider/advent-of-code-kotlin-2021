@@ -1,8 +1,8 @@
 fun main() {
-    val readings = parseInputFile("Day08")
+    val readings = loadReadings("Day08")
 
     val digits = listOf("abcefg", "cf", "acdeg", "acdfg", "bcdf", "abdfg", "abdefg", "acf", "abcdefg", "abcdfg")
-    val mappings = buildAllPossibleMappings()
+    val mappings = buildAllPossibleMappings("abcdefg")
 
     val results = readings.map { (patterns, numbers) ->
         mappings.filter { mapping ->
@@ -30,18 +30,18 @@ fun main() {
     println("Part 2: $hard")
 }
 
-fun parseInputFile(name: String): List<Pair<List<String>, List<String>>> {
+fun loadReadings(name: String): List<Pair<List<String>, List<String>>> {
     val lines = readInput(name)
-    val outputs = lines.map { line ->
-        val parts = line.split(" | ")
-        val patterns = parts.first().split(" ")
-        val results = parts.last().split(" ")
-        patterns to results
+    return lines.map { line ->
+        line.split(" | ").let { (p, r) ->
+            val patterns = p.split(" ")
+            val results = r.split(" ")
+            patterns to results
+        }
     }
-    return outputs
 }
 
-fun buildAllPossibleMappings(): Sequence<Map<Char, Char>> {
+fun buildAllPossibleMappings(segments: String): Sequence<Map<Char, Char>> {
     fun permute(value: String, result: String = ""): List<String> {
         return if (value.isEmpty()) {
             listOf(result)
@@ -52,13 +52,7 @@ fun buildAllPossibleMappings(): Sequence<Map<Char, Char>> {
         }
     }
 
-    val segments = "abcdefg"
     return permute(segments).asSequence().map { permutation ->
         segments.zip(permutation).toMap()
     }
 }
-
-fun <K, V> Map<K, V>.transpose() =
-    emptyMap<V, K>() + this.map { (key, value) -> value to key }
-
-fun List<Int>.joinToString() = this.joinToString("").toInt()
